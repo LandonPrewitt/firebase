@@ -22,8 +22,8 @@ firebase.auth().onAuthStateChanged(function(user) {
 });
 
 
-$("#loginBtn").click(function () {
-
+/* LOGIN PROCESS */
+function loginProcess() {
 	var email = $("#loginEmail").val();
 	var password = $("#loginPassword").val();
 
@@ -31,21 +31,46 @@ $("#loginBtn").click(function () {
 
 		$("#loginProgress").show();
 		$("#loginBtn").hide();
-
+		$("#loginError").hide();
 
 		firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
 			$("#loginError").show().text(error);
+			$("#loginProgress").hide();
+			$("#loginBtn").show();
 		});
-
 	}
+}
 
+$("#loginBtn").click(function () {
+	loginProcess();
 });
 
+$(document).keypress(function(e) {
+    
+    if(e.which == 13) {
+    	if(firebase.auth().currentUser) {
+    	} else {
+    		loginProcess();
+    	}
+    }	
+});
+
+
+/* SIGN OUT PROCESS */
 $("#signOutBtn").click(function () {
 
-	firebase.auth().signOut();
-	$(".login-cover").show();
-	$("#loginProgress").hide();
-	$("#loginBtn").show();
+	firebase.auth().signOut().then(function() {
+		// Sign-out successful
+		$(".login-cover").show();
+		$("#loginProgress").hide();
+		$("#loginBtn").show();
+		$("#loginPassword").val("");
+
+	}, function(error) {
+		// Sign-out failed
+		alert(error);
+
+	});
+
 
 });
